@@ -16,7 +16,9 @@
     "compile": "lingui compile",
     "clean": "lingui extract --clean",
     "upgrade-interactive": "npm-check --update",
-    "check-translations": "lingui extract && node utils/checkTranslations.js"
+    "check-translations": "lingui extract && node utils/checkTranslations.js",
+    "docz:dev": "docz dev --port 3001",
+    "docz:build": "docz build"
   },
   "husky": {
     "hooks": {
@@ -39,6 +41,8 @@
     "cds-size-plugin": "^1.2.0",
     "clean-element": "^1.0.3",
     "clean-tag": "^3.0.0",
+    "docz": "^1.0.0-rc.3",
+    "docz-theme-default": "^1.0.0-rc.3",
     "emotion": "^10.0.9",
     "emotion-server": "^10.0.9",
     "emotion-theming": "^10.0.9",
