@@ -6,8 +6,8 @@ const { DB_USER: user, DB_URL: url, DB_PASSWORD: password } = process.env
 
 let db, drop, truncate
 
-describe('Queries', () => {
-  describe('stats', () => {
+describe('Mutations', () => {
+  describe('flagIdentifier', () => {
     beforeAll(async () => {
       ;({ db, drop, truncate } = await makeTestDatabase({
         dbname: dbNameFromFile(__filename),
@@ -26,31 +26,35 @@ describe('Queries', () => {
       await truncate()
     })
 
-    describe('reportCount', () => {
-      it('lets you query the number of reports via a stats type', async () => {
-        let reports = await db.collection('reports')
-        await reports.save({ foo: 'I am a fake report' })
-        let app = await Server(db)
+    it('accepts an identifier and returns a summary', async () => {
+      let app = await Server(db)
 
-        let response = await request(app)
-          .post('/graphql')
-          .set('Content-Type', 'application/json; charset=utf-8')
-          .send({
-            query: `
-              {
-                stats {
-                  reportCount
+      let response = await request(app)
+        .post('/graphql')
+        .set('Content-Type', 'application/json; charset=utf-8')
+        .send({
+          query: `
+            mutation {
+              flagIdentifier(identifier: "555-555-5555") {
+                identifier
+                summary {
+                  total
                 }
               }
-            `,
-          })
+            }
+          `,
+        })
 
-        let {
-          data: {
-            stats: { reportCount },
-          },
-        } = response.body
-        expect(reportCount).toEqual(1)
+      let { data } = response.body
+      expect(data).toEqual({
+        flagIdentifier: {
+          identifier: '555-555-5555',
+          summary: [
+            {
+              total: 1,
+            },
+          ],
+        },
       })
     })
 

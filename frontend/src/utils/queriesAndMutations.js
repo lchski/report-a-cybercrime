@@ -6,6 +6,19 @@ export const GET_LANGUAGE_QUERY = gql`
   }
 `
 
+export const IDENTIFIER_FLAGGINGS_WITHIN = gql`
+  query($identifier: String!) {
+    stats {
+      identifierFlaggingsWithin(identifier: $identifier) {
+        identifier
+        summary {
+          date
+          total
+        }
+      }
+    }
+  }
+`
 export const GET_STATS_QUERY = gql`
   query GetStats {
     stats {
@@ -14,9 +27,11 @@ export const GET_STATS_QUERY = gql`
   }
 `
 
-export const CHANGE_LANGUAGE_MUTATION = gql`
-  mutation switchLanguage {
-    switchLanguage @client
+export const FLAG_IDENTIFIER_MUTATION = gql`
+  mutation flagIdentifier($identifier: String) {
+    flagIdentifier(identifier: $identifier) {
+      identifier
+    }
   }
 `
 

@@ -1,6 +1,6 @@
 const { GraphQLSchema, GraphQLObjectType, GraphQLString } = require('graphql')
 const { Stats } = require('./Stats')
-const { Report } = require('./Report')
+const { FlaggingSummary } = require('./FlaggingSummary')
 
 const query = new GraphQLObjectType({
   name: 'Query',
@@ -16,44 +16,25 @@ const query = new GraphQLObjectType({
 const mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: () => ({
-    saveReport: {
-      description: 'report stuff',
-      type: Report,
+    flagIdentifier: {
+      description: 'Flag an identifier',
+      type: FlaggingSummary,
       args: {
-        whatHappened: { type: GraphQLString, description: 'What happened' },
-        whatWasInvolved: {
+        identifier: {
           type: GraphQLString,
-          description: 'What was involved',
-        },
-        whatWasInvolvedOther: {
-          type: GraphQLString,
-          description: 'Free text field for what was involved',
-        },
-        howWereYouAffected: {
-          type: GraphQLString,
-          description: 'How were you affected',
+          description: 'the suspects identifier (phone no, url or email)',
         },
       },
-      resolve: (
-        _root,
-        {
-          whatHappened,
-          whatWasInvolved,
-          whatWasInvolvedOther,
-          howWereYouAffected,
-        },
-        { db },
-        _info,
-      ) => {
-        return db.saveReport({
-          whatHappened,
-          whatWasInvolved,
-          whatWasInvolvedOther,
-          howWereYouAffected,
-          createdAt: new Date(Date.now()).toLocaleString('en-ca', {
-            timeZone: 'America/Toronto',
-          }),
+      resolve: async (_root, { identifier }, { db }, _info) => {
+        await db.saveReport({
+          identifier: identifier,
+          createdAt: new Date().toISOString(),
         })
+        let summary = await db.summariseByDay(identifier)
+        return {
+          identifier,
+          summary,
+        }
       },
     },
   }),
